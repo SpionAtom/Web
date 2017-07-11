@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <title>Slide Puzzle</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="css/stylesheet.css">
+    <script src="js/pixi.min.js" type="text/javascript"></script>
+    <script src="js/SlidePuzzleGame.js" type="text/javascript"></script>
+    <script src="js/main.js" type="text/javascript"></script>
+    
+    
+  </head>
+  <body>    
+     <h1>Slide Puzzle</h1>
+     <div id="menu">
+       <div>
+        <table>
+          <tr>
+            <td class="tableLabel">Width:</td>
+            <td><input class="tableInput" type="number" id="desiredWidth" min="2" max="8"></input></td>
+          </tr>
+          <tr>
+            <td class="tableLabel">Height:</td>
+            <td><input class="tableInput" type="number" id="desiredHeight" min="2" max="8"></input></td>
+          </tr>
+        </table>
+       </div>
+        <div>
+          <button id="reset">Reset</button>
+          <button id="scramble">Scramble</button>          
+        </div>
+      </div>
+     <div id="CanvasBox"></div>     
+  </body>
+</html>
