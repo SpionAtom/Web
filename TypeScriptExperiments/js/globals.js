@@ -7,3 +7,11 @@
       framesPerSeconds: 60
     };
 
+    // Timer
+    var lastUpdated = 0, updateWaitTime = 1000 / config.framesPerSeconds;
+
+    // Stages
+    var rootStage;
+
+    var renderer;
+    var canvasBox;
