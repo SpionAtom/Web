@@ -9,14 +9,19 @@ var WindowHandler = (function () {
         this.pixiApp = new PIXI.Application(applicationConfig.resolution.width, applicationConfig.resolution.height, { backgroundColor: applicationConfig.backgroundColor });
         this.canvas = document.getElementById("CanvasBox");
         this.canvas.appendChild(this.pixiApp.view);
-        app = new App(this.pixiApp.stage);
+        app = new App(this.pixiApp);
+        var padding = 32;
+        var canvasRect = this.canvas.getBoundingClientRect();
+        var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
+        this.pixiApp.renderer.resize(w, h);
+        app.onWindowResize(w, h);
     };
     WindowHandler.prototype.onResize = function () {
         var padding = 32;
         var canvasRect = this.canvas.getBoundingClientRect();
         var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
         this.pixiApp.renderer.resize(w, h);
-        app.onResize(w, h);
+        app.onWindowResize(w, h);
     };
     return WindowHandler;
 }());
@@ -31,5 +36,5 @@ var applicationConfig = {
 };
 var windowHandler = new WindowHandler();
 var app;
-window.addEventListener("load", windowHandler.init);
+window.addEventListener("DOMContentLoaded", windowHandler.init);
 window.addEventListener('resize', windowHandler.onResize);

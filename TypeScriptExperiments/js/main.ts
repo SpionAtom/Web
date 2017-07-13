@@ -20,31 +20,36 @@
             );
             this.canvas = document.getElementById("CanvasBox");
             this.canvas.appendChild(this.pixiApp.view);
-
-            app = new App(this.pixiApp.stage);
+            app = new App(this.pixiApp);
+            
+            var padding = 32;            
+            var canvasRect = this.canvas.getBoundingClientRect();        
+            var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;            
+            this.pixiApp.renderer.resize(w, h);
+            app.onWindowResize(w, h);
         }
 
         onResize():void {
             var padding = 32;            
             var canvasRect = this.canvas.getBoundingClientRect();        
-            var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
+            var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;            
             this.pixiApp.renderer.resize(w, h);
-            app.onResize(w, h);
+            app.onWindowResize(w, h);
         }
     }
 
-        var applicationConfig:IapplicationConfig = {
-            resolution: {
-                width: 320,
-                height: 240,
-                ratio: 640. / 480.
-            },
-            backgroundColor: 0x474758,
-            framesPerSeconds: 60
-        }
+    var applicationConfig:IapplicationConfig = {
+        resolution: {
+            width: 320,
+            height: 240,
+            ratio: 640. / 480.
+        },
+        backgroundColor: 0x474758,
+        framesPerSeconds: 60
+    }
 
 
     var windowHandler:WindowHandler = new WindowHandler();
     var app:App;
-    window.addEventListener("load", windowHandler.init);
+    window.addEventListener("DOMContentLoaded", windowHandler.init);
     window.addEventListener('resize', windowHandler.onResize);
