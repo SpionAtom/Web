@@ -1,9 +1,6 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 ///<reference path="pixi.js.d.ts" />
-//declare AppConfig = IapplicationConfig;
-//import IapplicationConfig = IapplicationConfig;
-var app_1 = require("./app");
+///<reference path="./config.ts" />
+///<reference path="./app.ts" />
 var WindowHandler = (function () {
     function WindowHandler() {
     }
@@ -12,6 +9,7 @@ var WindowHandler = (function () {
         this.pixiApp = new PIXI.Application(applicationConfig.resolution.width, applicationConfig.resolution.height, { backgroundColor: applicationConfig.backgroundColor });
         this.canvas = document.getElementById("CanvasBox");
         this.canvas.appendChild(this.pixiApp.view);
+        app = new App(this.pixiApp.stage);
     };
     WindowHandler.prototype.onResize = function () {
         var padding = 32;
@@ -22,7 +20,6 @@ var WindowHandler = (function () {
     };
     return WindowHandler;
 }());
-exports.WindowHandler = WindowHandler;
 var applicationConfig = {
     resolution: {
         width: 320,
@@ -33,6 +30,6 @@ var applicationConfig = {
     framesPerSeconds: 60
 };
 var windowHandler = new WindowHandler();
-var app = new app_1.App(windowHandler.pixiApp.stage);
+var app;
 window.addEventListener("load", windowHandler.init);
 window.addEventListener('resize', windowHandler.onResize);

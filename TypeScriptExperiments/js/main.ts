@@ -1,15 +1,14 @@
 ///<reference path="pixi.js.d.ts" />
-//declare AppConfig = IapplicationConfig;
-//import IapplicationConfig = IapplicationConfig;
-import {App} from "./app";
-import { IapplicationConfig } from "./config";
+///<reference path="./config.ts" />
+///<reference path="./app.ts" />
 
 
-    export class WindowHandler {
+
+    class WindowHandler {
         pixiApp;
         canvas;
 
-        constructor() {
+        constructor() {            
         }
 
         init():void {
@@ -20,7 +19,9 @@ import { IapplicationConfig } from "./config";
                 {backgroundColor: applicationConfig.backgroundColor}
             );
             this.canvas = document.getElementById("CanvasBox");
-            this.canvas.appendChild(this.pixiApp.view);        
+            this.canvas.appendChild(this.pixiApp.view);
+
+            app = new App(this.pixiApp.stage);
         }
 
         onResize():void {
@@ -44,6 +45,6 @@ import { IapplicationConfig } from "./config";
 
 
     var windowHandler:WindowHandler = new WindowHandler();
-    var app:App = new App(windowHandler.pixiApp.stage);
+    var app:App;
     window.addEventListener("load", windowHandler.init);
     window.addEventListener('resize', windowHandler.onResize);

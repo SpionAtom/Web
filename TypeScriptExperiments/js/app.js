@@ -1,6 +1,4 @@
-"use strict";
 ///<reference path="pixi.js.d.ts" />
-Object.defineProperty(exports, "__esModule", { value: true });
 var App = (function () {
     function App(_stage) {
         this.currentStage = _stage;
@@ -17,12 +15,13 @@ var App = (function () {
         }
         this.config.x = (newWidth - swidth) / 2;
         this.config.y = (newHeight - sheight) / 2;
+        var factor = 20;
         var graphics = new PIXI.Graphics();
         graphics.lineStyle(2, 0x0000FF, 1);
         graphics.beginFill(0xFF700B, 1);
-        graphics.drawRect(50, 250, 120, 120);
+        graphics.drawRect(this.config.x, this.config.height, swidth * factor, sheight * factor);
         this.currentStage.addChild(graphics);
+        console.log(scale);
     };
     return App;
 }());
-exports.App = App;
