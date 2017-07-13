@@ -3,6 +3,20 @@ var App = (function () {
     function App(_stage) {
         this.currentStage = _stage;
         this.config = { x: 0, y: 0, width: 4, height: 4 };
+        this.conMap = new PIXI.Container();
+        this.currentStage.addChild(this.conMap);
+        this.tiles.push(new PIXI.Sprite());
+        var cr = new PIXI.CanvasRenderer(100, 100, { backgroundColor: 0x123456 });
+        var g = new PIXI.Graphics();
+        // set a fill and a line style again and draw a rectangle
+        g.lineStyle(1, 0x0000FF, 1);
+        g.beginFill(0xFF700B, 1);
+        g.drawRect(0, 0, 100, 100);
+        cr;
+        addChild(g);
+        var tex = cr.generateTexture(g);
+        var spr = PIXI.Sprite.from(tex.baseTexture);
+        this.currentStage.addChild(spr);
     }
     App.prototype.onResize = function (newWidth, newHeight) {
         var scale = newWidth / newHeight;

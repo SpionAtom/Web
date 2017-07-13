@@ -3,6 +3,7 @@
 var application = {
     
     currentStage: null,
+    conMap,
 
     config: {
         width: 5,
