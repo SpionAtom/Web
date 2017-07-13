@@ -19,9 +19,9 @@ var App = (function () {
         var graphics = new PIXI.Graphics();
         graphics.lineStyle(2, 0x0000FF, 1);
         graphics.beginFill(0xFF700B, 1);
-        graphics.drawRect(this.config.x, this.config.height, swidth * factor, sheight * factor);
+        graphics.drawRect(this.config.x, this.config.y, swidth, sheight);
         this.currentStage.addChild(graphics);
-        console.log(scale);
+        console.log(newWidth, newHeight);
     };
     return App;
 }());

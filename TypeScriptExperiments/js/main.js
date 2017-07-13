@@ -13,9 +13,9 @@ var WindowHandler = (function () {
     };
     WindowHandler.prototype.onResize = function () {
         var padding = 32;
-        var w = window.innerWidth, h = window.innerHeight;
         var canvasRect = this.canvas.getBoundingClientRect();
-        this.pixiApp.renderer.resize(w - padding, h - canvasRect.top - padding / 2);
+        var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
+        this.pixiApp.renderer.resize(w, h);
         app.onResize(w, h);
     };
     return WindowHandler;
