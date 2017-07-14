@@ -11,7 +11,13 @@ const DEBUGMODE = false;
         config;
         tileContainer:PIXI.Container;
         tiles;
-        map;        
+        map;
+        steps:number;
+
+        setSteps(newSteps:number) {
+            this.steps = newSteps;
+            document.getElementById('steps').innerHTML = String(this.steps);
+        }
 
         constructor(_pixiApp:PIXI.Application) {
             this.config = { x: 0, y: 0, width: 5, height: 5, tileSize: 1};
@@ -22,6 +28,7 @@ const DEBUGMODE = false;
             this.tiles = [];            
             this.map = new Map(this.config.width, this.config.height);
             this.createTiles();            
+            this.steps = 0;
         }
 
         createTiles(): void {
@@ -41,17 +48,26 @@ const DEBUGMODE = false;
         }
 
         arrangeTiles() {
-            console.log("Arranging the tiles:");            
+            //console.log("- Arranging the tiles");            
             var out;    
             for (var y = 0; y < this.config.height; y++) {
                 out = "    ";
                 for (var x = 0; x < this.config.width; x++) {
-                    out += this.map.map[x][y] + "(" + x + "|" + y + "),";                                                       
-                    if (this.map.map[x][y] > 0) {
-                        this.tiles[this.map.map[x][y] - 1].sprite.x = x * this.config.tileSize;
-                        this.tiles[this.map.map[x][y] - 1].sprite.y = y * this.config.tileSize;
-                        this.tiles[this.map.map[x][y] - 1].x = x;
-                        this.tiles[this.map.map[x][y] - 1].y = y;
+                    var m = this.map.map[x][y];
+                    out += m + "(" + x + "|" + y + "),";                                                       
+                    if (m > 0) {
+                        this.tiles[m - 1].sprite.x = x * this.config.tileSize;
+                        this.tiles[m - 1].sprite.y = y * this.config.tileSize;
+                        this.tiles[m - 1].x = x;
+                        this.tiles[m - 1].y = y;
+                        // special tinting if on final position
+                        if (this.tiles[m - 1].x === this.tiles[m - 1].finalX &&
+                            this.tiles[m - 1].y === this.tiles[m - 1].finalY
+                        ) {
+                            this.tiles[m - 1].sprite.tint = 0xAAFFAA;                            
+                        } else {
+                            this.tiles[m - 1].sprite.tint = 0x885555;
+                        }
                     }                   
                 }
                 if (DEBUGMODE) {
@@ -82,19 +98,36 @@ const DEBUGMODE = false;
 
             this.pixiApp.renderer.resize(this.config.width * factor + margin, this.config.height * factor + margin);            
             this.createTiles();
-        }             
+        }
+
 
         
     }
 
 function onTileClick() {
-    console.log("Clicked on: " + this.tile.num);          
-    app.map.moveTileAt(this.tile.x, this.tile.y);
-    app.arrangeTiles();    
+    var logText:string = "- Clicked on: [" + (this.tile.num + 1) + "]";
+              
+    
+    if (this.tile.x == app.map.empty.x || this.tile.y == app.map.empty.y) {
+        logText += ". Moved Tiles";
+        app.map.moveTileAt(this.tile.x, this.tile.y);        
+        app.setSteps(app.steps + 1);
+        app.arrangeTiles();
+    }        
+    console.log(logText);
 }
 
 function scramble() {
     console.log("Scramble");
     app.map.scramble();
     app.arrangeTiles();
+    app.setSteps(0);
+}
+
+function resetGame() {
+    console.log("Reset game");
+    app.map.order();
+    app.arrangeTiles();
+    app.setSteps(app.steps + 1);
+    app.setSteps(0);
 }

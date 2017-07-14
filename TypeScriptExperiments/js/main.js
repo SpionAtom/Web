@@ -16,6 +16,7 @@ var WindowHandler = (function () {
         this.pixiApp.renderer.resize(w, h);
         app.onWindowResize(w, h);
         document.getElementById('scramble').addEventListener('click', scramble);
+        document.getElementById('reset').addEventListener('click', resetGame);
     };
     WindowHandler.prototype.onResize = function () {
         var padding = 32;

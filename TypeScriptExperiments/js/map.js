@@ -8,6 +8,7 @@ var Map = (function () {
     // Recreate the map array
     // Then order the map
     Map.prototype.resize = function (_width, _height) {
+        console.log("- Resize the map array");
         this.map = [];
         this.empty = { x: 0, y: 0 };
         for (var i = 0; i < _width; i++) {
@@ -17,7 +18,7 @@ var Map = (function () {
     };
     // bring the map in order
     Map.prototype.order = function () {
-        console.log("Reset the map array:");
+        console.log("- Reset the map array");
         var n = 1;
         for (var y = 0; y < this.height; y++) {
             for (var x = 0; x < this.width; x++) {

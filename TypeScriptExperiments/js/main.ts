@@ -28,6 +28,7 @@
             this.pixiApp.renderer.resize(w, h);
             app.onWindowResize(w, h);            
             document.getElementById('scramble').addEventListener('click', scramble);
+            document.getElementById('reset').addEventListener('click', resetGame);
         }
 
         onResize():void {

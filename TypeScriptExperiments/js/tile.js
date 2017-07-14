@@ -1,8 +1,10 @@
 ///<reference path="pixi.js.d.ts" />
 var Tile = (function () {
     function Tile(app, _num) {
-        this.x = 0; //(_num % app.config.width);
-        this.y = 0; //(Math.floor(_num / app.config.width));
+        this.x = 0;
+        this.y = 0;
+        this.finalX = (_num % app.config.width);
+        this.finalY = (Math.floor(_num / app.config.width));
         this.num = _num;
         this.sprite = this.createSprite(app, _num);
     }
@@ -10,10 +12,11 @@ var Tile = (function () {
         var tileSize = app.config.tileSize;
         var renderTexture = PIXI.RenderTexture.create(tileSize, tileSize);
         var graphics = new PIXI.Graphics();
+        var margin = 3;
         // draw a rounded rectangle
         graphics.lineStyle(2, 0xDDDDDD, 1);
         graphics.beginFill(0x878787, 0.25);
-        graphics.drawRoundedRect(0, 0, tileSize, tileSize, 15);
+        graphics.drawRect(margin, margin, tileSize - 2 * margin, tileSize - 2 * margin);
         graphics.endFill();
         var labelStyle = new PIXI.TextStyle({
             fontFamily: 'Impact',

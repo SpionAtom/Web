@@ -11,9 +11,16 @@ h1 {
 }
 
 #menu {
+  font-family: "Helvetica", Times, serif;
+  font-size: 1em;
   text-align: center;
+  color: white;
+}
+
+button {
+  height: 3em;
 }
 
 #CanvasBox {
-  text-align: center;
+  text-align: center;  
 }
