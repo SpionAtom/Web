@@ -31,14 +31,20 @@
             document.getElementById('reset').addEventListener('click', resetGame);
         }
 
-        onResize():void {
+    onResize = debounce(function() {
+            console.log("- window resize");
             var padding = 32;            
             var canvasRect = this.canvas.getBoundingClientRect();        
-            var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;            
+            var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2; 
+            w = Math.max(w, 320);
+            h = Math.max(h, 320);
             this.pixiApp.renderer.resize(w, h);
             app.onWindowResize(w, h);
-        }
+        }, 250);
+
     }
+
+
 
     var applicationConfig:IapplicationConfig = {
         resolution: {

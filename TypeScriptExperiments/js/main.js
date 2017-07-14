@@ -3,6 +3,16 @@
 ///<reference path="./app.ts" />
 var WindowHandler = (function () {
     function WindowHandler() {
+        this.onResize = debounce(function () {
+            console.log("- window resize");
+            var padding = 32;
+            var canvasRect = this.canvas.getBoundingClientRect();
+            var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
+            w = Math.max(w, 320);
+            h = Math.max(h, 320);
+            this.pixiApp.renderer.resize(w, h);
+            app.onWindowResize(w, h);
+        }, 250);
     }
     WindowHandler.prototype.init = function () {
         console.log("Initialisierung...");
@@ -17,13 +27,6 @@ var WindowHandler = (function () {
         app.onWindowResize(w, h);
         document.getElementById('scramble').addEventListener('click', scramble);
         document.getElementById('reset').addEventListener('click', resetGame);
-    };
-    WindowHandler.prototype.onResize = function () {
-        var padding = 32;
-        var canvasRect = this.canvas.getBoundingClientRect();
-        var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
-        this.pixiApp.renderer.resize(w, h);
-        app.onWindowResize(w, h);
     };
     return WindowHandler;
 }());
