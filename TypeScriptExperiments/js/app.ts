@@ -1,6 +1,7 @@
 ///<reference path="pixi.js.d.ts" />
 ///<reference path="./map.ts" />
 ///<reference path="./tile.ts" />
+///<reference path="./timerhandler.ts" />
 
 const DEBUGMODE = false;
 
@@ -13,6 +14,7 @@ const DEBUGMODE = false;
         tiles;
         map;
         steps:number;
+        timerHandler:TimerHandler;
 
         setSteps(newSteps:number) {
             this.steps = newSteps;
@@ -29,6 +31,7 @@ const DEBUGMODE = false;
             this.map = new Map(this.config.width, this.config.height);
             this.createTiles();            
             this.steps = 0;
+            this.timerHandler = new TimerHandler();
         }
 
         createTiles(): void {
@@ -66,7 +69,7 @@ const DEBUGMODE = false;
                         ) {
                             this.tiles[m - 1].sprite.tint = 0xAAFFAA;                            
                         } else {
-                            this.tiles[m - 1].sprite.tint = 0x885555;
+                            this.tiles[m - 1].sprite.tint = 0xFFAAAA;
                         }
                     }                   
                 }
@@ -113,21 +116,27 @@ function onTileClick() {
         app.map.moveTileAt(this.tile.x, this.tile.y);        
         app.setSteps(app.steps + 1);
         app.arrangeTiles();
+        app.timerHandler.start();        
     }        
     console.log(logText);
 }
+
 
 function scramble() {
     console.log("Scramble");
     app.map.scramble();
     app.arrangeTiles();
     app.setSteps(0);
+    app.timerHandler.resetTimer();
+
 }
 
 function resetGame() {
     console.log("Reset game");
     app.map.order();
     app.arrangeTiles();
-    app.setSteps(app.steps + 1);
     app.setSteps(0);
+    app.timerHandler.resetTimer();
 }
+
+

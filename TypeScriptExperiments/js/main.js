@@ -1,4 +1,5 @@
 ///<reference path="pixi.js.d.ts" />
+///<reference path="webfontloader.d.ts" />
 ///<reference path="./config.ts" />
 ///<reference path="./app.ts" />
 var WindowHandler = (function () {
@@ -41,5 +42,34 @@ var applicationConfig = {
 };
 var windowHandler = new WindowHandler();
 var app;
-window.addEventListener("DOMContentLoaded", windowHandler.init);
 window.addEventListener('resize', windowHandler.onResize);
+// http://www.enea.sk/blog/preloading-web-font-pixi.js.html
+var fontName = 'Nunito';
+window.onload = function () {
+    WebFont.load({
+        // this event is triggered when the fonts have been rendered, see https://github.com/typekit/webfontloader
+        active: function () {
+            // let browser take a breath. Some fonts may require more room for taking deep breath
+            setTimeout(function () {
+                windowHandler.init();
+            }, 500);
+        },
+        // when font is loaded do some magic, so font can be correctly rendered immediately after PIXI is initialized
+        fontloading: doMagic,
+        // multiple fonts can be passed here
+        google: {
+            families: [fontName]
+        }
+    });
+};
+// this one is important
+function doMagic() {
+    // create <p> tag with our font and render some text secretly. We don't need to see it after all...
+    var el = document.createElement('p');
+    el.style.fontFamily = fontName;
+    el.style.fontSize = "0px";
+    el.style.visibility = "hidden";
+    el.innerHTML = '.';
+    document.body.appendChild(el);
+}
+;
