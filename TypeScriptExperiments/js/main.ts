@@ -26,7 +26,8 @@
             var canvasRect = this.canvas.getBoundingClientRect();        
             var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;            
             this.pixiApp.renderer.resize(w, h);
-            app.onWindowResize(w, h);
+            app.onWindowResize(w, h);            
+            document.getElementById('scramble').addEventListener('click', scramble);
         }
 
         onResize():void {
@@ -52,4 +53,5 @@
     var windowHandler:WindowHandler = new WindowHandler();
     var app:App;
     window.addEventListener("DOMContentLoaded", windowHandler.init);
-    window.addEventListener('resize', windowHandler.onResize);
+    window.addEventListener('resize', windowHandler.onResize);    
+    

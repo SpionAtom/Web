@@ -15,6 +15,7 @@ var WindowHandler = (function () {
         var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
         this.pixiApp.renderer.resize(w, h);
         app.onWindowResize(w, h);
+        document.getElementById('scramble').addEventListener('click', scramble);
     };
     WindowHandler.prototype.onResize = function () {
         var padding = 32;
