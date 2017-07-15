@@ -16,11 +16,17 @@ class StepsAndTimerHandler {
     start() {
         if (!this.running) {
             this.running = true;
-            this.seconds = 0;
-            this.steps = 0;
+            //this.seconds = 0;
+            //this.steps = 0;
             this.secondsTickerRef = setInterval(this.secondsTicker, 1000); 
-        }
-        
+        }        
+    }
+
+    stop() {
+        if (this.running) {
+            this.running = false;            
+            clearInterval(this.secondsTickerRef);
+        }        
     }
 
     reset() {

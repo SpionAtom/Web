@@ -6,7 +6,7 @@
 var DEBUGMODE = false;
 var App = (function () {
     function App(_pixiApp) {
-        this.config = { x: 0, y: 0, width: 5, height: 5, tileSize: 1 };
+        this.config = { x: 0, y: 0, width: 7, height: 7, tileSize: 1 };
         this.pixiApp = _pixiApp;
         this.currentStage = this.pixiApp.stage;
         this.tileContainer = new PIXI.Container();
@@ -82,7 +82,7 @@ var App = (function () {
 }());
 function onTileClick() {
     var logText = "- Clicked on: [" + (this.tile.num + 1) + "]";
-    if (this.tile.x == app.map.empty.x || this.tile.y == app.map.empty.y) {
+    if (this.tile.x == app.map.gap.x || this.tile.y == app.map.gap.y) {
         logText += ". Moved Tiles";
         app.map.moveTileAt(this.tile.x, this.tile.y);
         app.arrangeTiles();
@@ -90,23 +90,27 @@ function onTileClick() {
         app.stepsAndTimerHandler.incrementSteps();
     }
     console.log(logText);
+    if (app.map.alreadySolved()) {
+        console.log("- solved!");
+        app.stepsAndTimerHandler.stop();
+    }
 }
 function scramble() {
-    console.log("- Scramble");
+    console.log("- button: Scramble");
     app.map.scramble();
     app.arrangeTiles();
     app.stepsAndTimerHandler.reset();
     app.solverHandler.stop();
 }
 function resetGame() {
-    console.log("- Reset game");
+    console.log("- button: Reset game");
     app.map.order();
     app.arrangeTiles();
     app.stepsAndTimerHandler.reset();
     app.solverHandler.stop();
 }
 function solveGame() {
-    console.log("- solve game");
+    console.log("- button: solve");
     if (!app.solverHandler.running) {
         app.stepsAndTimerHandler.start();
     }
