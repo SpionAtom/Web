@@ -30,6 +30,7 @@
             app.onWindowResize(w, h);            
             document.getElementById('scramble').addEventListener('click', scramble);
             document.getElementById('reset').addEventListener('click', resetGame);
+            document.getElementById('solve').addEventListener('click', solveGame);
         }
 
         onResize = debounce(function() {

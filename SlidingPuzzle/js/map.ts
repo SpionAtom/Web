@@ -4,7 +4,7 @@ class Map {
     map;
     width:number;
     height:number;
-    empty;
+    empty:Point;
 
     constructor(_width:number, _height:number) {
         this.width = _width;

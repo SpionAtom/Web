@@ -2,6 +2,7 @@
 ///<reference path="./map.ts" />
 ///<reference path="./tile.ts" />
 ///<reference path="./stepsandtimerhandler.ts" />
+///<reference path="./solver.ts" />
 
 const DEBUGMODE = false;
 
@@ -14,6 +15,7 @@ const DEBUGMODE = false;
         tiles;
         map;
         stepsAndTimerHandler:StepsAndTimerHandler;
+        solver;
 
         constructor(_pixiApp:PIXI.Application) {
             this.config = { x: 0, y: 0, width: 5, height: 5, tileSize: 1};
@@ -25,6 +27,7 @@ const DEBUGMODE = false;
             this.map = new Map(this.config.width, this.config.height);
             this.createTiles();            
             this.stepsAndTimerHandler = new StepsAndTimerHandler();
+            this.solver = new Solver(this.map);
         }
 
         createTiles(): void {
@@ -118,6 +121,7 @@ function scramble() {
     app.map.scramble();
     app.arrangeTiles();
     app.stepsAndTimerHandler.reset();
+    app.solver.stop();
 
 }
 
@@ -126,6 +130,15 @@ function resetGame() {
     app.map.order();
     app.arrangeTiles();
     app.stepsAndTimerHandler.reset();
+    app.solver.stop();
+}
+
+function solveGame() {
+    console.log("- solve game");
+    if (!app.solver.running) {
+        app.stepsAndTimerHandler.start();
+    }
+    app.solver.click();
 }
 
 

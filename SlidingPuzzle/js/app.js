@@ -2,6 +2,7 @@
 ///<reference path="./map.ts" />
 ///<reference path="./tile.ts" />
 ///<reference path="./stepsandtimerhandler.ts" />
+///<reference path="./solver.ts" />
 var DEBUGMODE = false;
 var App = (function () {
     function App(_pixiApp) {
@@ -14,6 +15,7 @@ var App = (function () {
         this.map = new Map(this.config.width, this.config.height);
         this.createTiles();
         this.stepsAndTimerHandler = new StepsAndTimerHandler();
+        this.solver = new Solver(this.map);
     }
     App.prototype.createTiles = function () {
         // remove all tiles            
@@ -94,10 +96,19 @@ function scramble() {
     app.map.scramble();
     app.arrangeTiles();
     app.stepsAndTimerHandler.reset();
+    app.solver.stop();
 }
 function resetGame() {
     console.log("- Reset game");
     app.map.order();
     app.arrangeTiles();
     app.stepsAndTimerHandler.reset();
+    app.solver.stop();
+}
+function solveGame() {
+    console.log("- solve game");
+    if (!app.solver.running) {
+        app.stepsAndTimerHandler.start();
+    }
+    app.solver.click();
 }

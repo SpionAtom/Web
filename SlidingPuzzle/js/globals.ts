@@ -1,3 +1,8 @@
+interface Point {
+	x:number,
+	y:number
+}
+
 function sign(n:number):number {
     if (n > 0) {
         return 1;
