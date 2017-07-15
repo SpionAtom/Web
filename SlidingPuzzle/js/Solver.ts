@@ -1,58 +1,11 @@
-interface ISolver {
+class SimpleSolver extends Solver {
 
-}
-
-class Solver implements ISolver {
-    
-    app;
     map:Map;
-    running;
-    solverTickerRef;
-
-    // app is just needed to call the re arrange method
     constructor(map:Map) {
-        this.map = map;       
-        this.running = false;
+        super(map);        
     }
 
-    click() {
-        if (!this.running) {
-            this.start();
-        } else {
-            this.stop();
-        }
-    }
- 
-    start() {
-        if (!this.running) {
-            this.running = true;            
-            this.solverTickerRef = setInterval(this.solveTicker, 250); 
-        }
-        this.showSolveButton("Stop solving");        
-    }
-
-    stop () {
-        if (this.running) {
-            clearInterval(this.solverTickerRef);    
-            this.running = false;
-            this.showSolveButton("Start solving"); 
-        }
-    }
-
-    showSolveButton(text:string) {
-        document.getElementById('solve').innerHTML = text;
-    }
-
-    solveTicker() {
-        console.log("- solve step");
-        let moveAt:Point = app.solver.solveStep();
-        app.solver.map.moveTileAt(moveAt.x, moveAt.y);
-        app.arrangeTiles();
-        app.stepsAndTimerHandler.incrementSteps();
-    }
-
-    // has to return a Point which is the map position that will be "clicked" by the solver
-    solveStep():Point {
+    solveNextStep():Point {
 
         console.log("- doesn't really solve, just moves random (like in the scramble method from map");
         var inX = this.map.empty.x;
@@ -65,6 +18,4 @@ class Solver implements ISolver {
 
         return {x: inX, y: inY};
     }
-
-
 }

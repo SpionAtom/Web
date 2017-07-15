@@ -1,43 +1,19 @@
-var Solver = (function () {
-    // app is just needed to call the re arrange method
-    function Solver(map) {
-        this.map = map;
-        this.running = false;
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var SimpleSolver = (function (_super) {
+    __extends(SimpleSolver, _super);
+    function SimpleSolver(map) {
+        return _super.call(this, map) || this;
     }
-    Solver.prototype.click = function () {
-        if (!this.running) {
-            this.start();
-        }
-        else {
-            this.stop();
-        }
-    };
-    Solver.prototype.start = function () {
-        if (!this.running) {
-            this.running = true;
-            this.solverTickerRef = setInterval(this.solveTicker, 250);
-        }
-        this.showSolveButton("Stop solving");
-    };
-    Solver.prototype.stop = function () {
-        if (this.running) {
-            clearInterval(this.solverTickerRef);
-            this.running = false;
-            this.showSolveButton("Start solving");
-        }
-    };
-    Solver.prototype.showSolveButton = function (text) {
-        document.getElementById('solve').innerHTML = text;
-    };
-    Solver.prototype.solveTicker = function () {
-        console.log("- solve step");
-        var moveAt = app.solver.solveStep();
-        app.solver.map.moveTileAt(moveAt.x, moveAt.y);
-        app.arrangeTiles();
-        app.stepsAndTimerHandler.incrementSteps();
-    };
-    // has to return a Point which is the map position that will be "clicked" by the solver
-    Solver.prototype.solveStep = function () {
+    SimpleSolver.prototype.solveNextStep = function () {
         console.log("- doesn't really solve, just moves random (like in the scramble method from map");
         var inX = this.map.empty.x;
         var inY = this.map.empty.y;
@@ -53,5 +29,5 @@ var Solver = (function () {
         }
         return { x: inX, y: inY };
     };
-    return Solver;
-}());
+    return SimpleSolver;
+}(Solver));
