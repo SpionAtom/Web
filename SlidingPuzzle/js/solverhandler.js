@@ -43,7 +43,7 @@ var SolverHandler = (function () {
     SolverHandler.prototype.start = function () {
         if (!this.running) {
             this.running = true;
-            this.solverTickerRef = setInterval(this.solveTicker, 1000);
+            this.solverTickerRef = setInterval(this.solveTicker, 10);
         }
         this.showSolveButton("Stop solving");
     };
@@ -58,7 +58,6 @@ var SolverHandler = (function () {
         document.getElementById('solve').innerHTML = text;
     };
     SolverHandler.prototype.solveTicker = function () {
-        console.log("- check if solved");
         if (app.map.alreadySolved()) {
             console.log("- solved!");
             app.solverHandler.stop();

@@ -22,7 +22,7 @@ var SimpleSolver = (function (_super) {
          * 05,06,08,  ,
          * 09,10,07,11,
          * 13,14,15,12,
-         * Here targetTile is 7 and targetPoint is {x:2, y:1}
+         * Here the first unsorted tile is 7 and destination is {x:2, y:1}
          */
         var destination = this.getFirstUnsortedTile();
         var tile = 1 + destination.x + destination.y * this.map.width;
@@ -33,7 +33,7 @@ var SimpleSolver = (function (_super) {
         console.log("\t- Next unsorted tile is: %d - %d,%d", tile, destination.x, destination.y);
         /**
          * 2)
-         * decide in which of the three major cases the targetPoint is.
+         * decide in which of the three major cases the destination is.
          * 1,1,1,1,2,2
          * 1,1,1,1,2,2
          * 1,1,1,1,2,2
@@ -41,15 +41,20 @@ var SimpleSolver = (function (_super) {
          * 1,1,1,1,2,2
          * 3,3,3,3,3,3
          * 3,3,3,3,3,3
-         * If targetPoint is not in the last two rows and not in the last
+         * If destination is not in the last two rows and not in the last
          * two columns then it's case Topleft (1 in the example grid).
-         * If targetPoint is not in the last two rows but in the last two
+         * If destination is not in the last two rows but in the last two
          * columns then it's case Right (2 in the example grid).
-         * If targetPoint is in the last two rows then it's case Bottom
+         * If destination is in the last two rows then it's case Bottom
          * (3 in the example grid)
          */
-        var majorCase = this.getMajorCase(destination);
-        switch (majorCase) {
+        /**
+         * Here some abbreviation:
+         * D - destination
+         * T - target
+         * G - gap
+         */
+        switch (this.getMajorCase(destination)) {
             case 0 /* Topleft */:
                 return this.doMajorCaseTopleft(destination);
             case 1 /* Right */:
@@ -64,19 +69,34 @@ var SimpleSolver = (function (_super) {
          * Get the position of the destination tile and save it
          * in target.
          */
-        var target = this.getPointOfTile(destination.tile);
+        var tile = 1 + destination.x + destination.y * this.map.width;
+        var target = this.getPointOfTile(tile);
         console.log("\t- Target is in: %d,%d", target.x, target.y);
         /**
          * At this point we have a destination and a target which
          * needs to be moved to the destination.
          * To be more specific: The target needs to move in the
-         * correct column and in the correct row.
+         * correct column and then in the correct row.
+         *
+         * New sub cases emerge:
+         * s,s,s,s,s,s,s,s,s,s
+         * s,s,s,s,D,R,R,R,R,R
+         * e,e,e,e,e,e,e,e,e,e
+         * e,e,e,e,e,e,e,e,e,e
+         * e,e,e,e,e,e,e,e,e,e
+         * e,e,e,e,e,e,e,e,e,e
+         * Here s are the already sorted tiles. D is the destination.
+         *
+         * R. T is right of D (Topleft.Right)
+         * E. T is somewhere else (Topleft.Else)
+         *
+         *
          */
-        if (target.x !== destination.point.x) {
-            return this.moveToColumn(target, destination);
-        }
-        else {
-            return this.moveToRow(target, destination);
+        switch (this.getTopleftCase(target, destination)) {
+            case 0 /* Right */:
+                return this.doTopleftCaseRight(target, destination);
+            case 1 /* Else */:
+                return this.doTopleftCaseElse(target, destination);
         }
     };
     SimpleSolver.prototype.doMajorCaseRight = function (destination) {
@@ -87,44 +107,88 @@ var SimpleSolver = (function (_super) {
         console.log("\t- Major Case: Bottom");
         return this.map.gap;
     };
-    SimpleSolver.prototype.getFirstUnsortedTile = function () {
-        var i = 1, x = 0, y = 0;
-        while (this.map.map[x][y] === i) {
-            i++;
-            x = (i - 1) % this.map.width;
-            y = Math.floor((i - 1) / this.map.width);
-        }
-        return { x: x, y: y };
-    };
-    SimpleSolver.prototype.getMajorCase = function (target) {
-        if (target.point.y >= this.map.height - 2) {
-            return 2 /* Bottom */;
-        }
-        else if (target.point.x >= this.map.width - 2) {
-            return 1 /* Right */;
+    SimpleSolver.prototype.doTopleftCaseRight = function (target, destination) {
+        console.log("\t\t- Topleftcase: Right");
+        /**
+         * To move the target left to the destination the gap has to
+         * be in front of the target.
+         *
+         * 1. The gap is below destination and behind the target.
+         *      > return D.x|G.y, it will move the gap in the
+         *        destination-col. That results in situation 2.
+         * 2. The gap is below destination and in front of the
+         *    target and not left of the destination.
+         *      > return G.x|D.y, it will move the gap in front of the
+         *        target.
+         * 3. The gap is below destination and left of the destination.
+         *      > return D.x\G.y, it will move the gap under the
+         *        destination. That results in situation 2
+         * 4. The gap is in destination-row and in front of target.
+         *      > return T.x|T.y, it will move the target towards
+         *        its destination
+         * 5. The gap is in destination-row and behind the target.
+         *      > return G.x|G.y + 1, it will move the gap one row
+         *        down. That results in situation 1.
+         */
+        if (this.map.gap.y > destination.y) {
+            // situation 1
+            if (!this.isInFrontOf(this.map.gap, target, destination)) {
+                return { x: destination.x, y: this.map.gap.y };
+            }
+            else if (this.map.gap.x >= destination.x) {
+                return { x: this.map.gap.x, y: destination.y };
+            }
+            else {
+                return { x: destination.x, y: this.map.gap.y };
+            }
         }
         else {
-            return 0 /* Topleft */;
+            // situation 4
+            if (this.isInFrontOf(this.map.gap, target, destination)) {
+                return target;
+            }
+            else {
+                return { x: this.map.gap.x, y: this.map.gap.y + 1 };
+            }
         }
     };
-    SimpleSolver.prototype.getPointOfTile = function (tile) {
-        if (tile < 0 || tile >= this.map.width * this.map.height) {
-            console.error("- ! Wrong tile number passed to method getPointOfTile(%d)", tile);
-            return;
+    SimpleSolver.prototype.doTopleftCaseElse = function (target, destination) {
+        console.log("\t\t- Topleftcase: Else");
+        if (target.x === destination.x) {
+            // gap is same col as target
+            if (this.map.gap.x === target.x) {
+                if (this.map.gap.y < target.y) {
+                    return target;
+                }
+                else {
+                    return { x: this.map.gap.x + 1, y: this.map.gap.y };
+                }
+                // gap is right of target
+            }
+            else if (this.map.gap.x > target.x) {
+                if (this.map.gap.y < target.y) {
+                    return { x: destination.x, y: this.map.gap.y };
+                }
+                else {
+                    return { x: this.map.gap.x, y: destination.y };
+                }
+                // gap is left of target
+            }
+            else {
+                if (this.map.gap.y < target.y) {
+                    return { x: destination.x, y: this.map.gap.y };
+                }
+                else if (target.y === destination.y + 1) {
+                    if (this.map.gap.y === target.y) {
+                        return { x: this.map.gap.x, y: this.map.gap.y + 1 };
+                    }
+                    else {
+                        return { x: target.x + 1, y: this.map.gap.y };
+                    }
+                }
+            }
         }
-        var i = 1, x = 0, y = 0;
-        while (this.map.map[x][y] !== tile) {
-            i++;
-            x = (i - 1) % this.map.width;
-            y = Math.floor((i - 1) / this.map.width);
-        }
-        return { x: x, y: y };
-    };
-    SimpleSolver.prototype.moveToColumn = function (target, destination) {
         /**
-         * D - destination
-         * T - target
-         * G - gap
          *
          * To move the T to the correct column (D.x) the gap needs
          * to be in the same row as T and "in front of T":
@@ -149,32 +213,77 @@ var SimpleSolver = (function (_super) {
          *      > return T.x|T.y, it will move T towards the destination
          *        column
          * 4. The gap is in the same row as T and behind T.
+         *      If T is in last row:
+         *      > return G.x|G.y - 1, it will move G above one row.
+         *      If T is not in the last row:
          *      > return G.x|G.y + 1, it will move G below one row.
          *        (Then we have situation 2.)
-
          */
         if (this.map.gap.y !== target.y) {
-            // situation 1:
+            // situation 1
             if (this.isInFrontOf(this.map.gap, target, destination)) {
-                console.log("\t\t\t- Gap not in the same row, and in front of Target");
                 return { x: this.map.gap.x, y: target.y };
             }
             else {
-                console.log("\t\t\t- Gap not in the same row, and behind Target");
                 return { x: destination.x, y: this.map.gap.y };
             }
         }
         else {
-            // situation 3:
+            // situation 3
             if (this.isInFrontOf(this.map.gap, target, destination)) {
-                console.log("\t\t\t- Gap in the same row, and in front of Target");
                 return target;
             }
             else {
-                console.log("\t\t\t- Gap in the same row, and behind Target");
-                return { x: this.map.gap.x, y: this.map.gap.y + 1 };
+                // situation 4.a
+                if (target.y === this.map.height - 1) {
+                    return { x: this.map.gap.x, y: this.map.gap.y - 1 };
+                }
+                else {
+                    return { x: this.map.gap.x, y: this.map.gap.y + 1 };
+                }
             }
         }
+    };
+    SimpleSolver.prototype.getFirstUnsortedTile = function () {
+        var i = 1, x = 0, y = 0;
+        while (this.map.map[x][y] === i) {
+            i++;
+            x = (i - 1) % this.map.width;
+            y = Math.floor((i - 1) / this.map.width);
+        }
+        return { x: x, y: y };
+    };
+    SimpleSolver.prototype.getMajorCase = function (target) {
+        if (target.y >= this.map.height - 2) {
+            return 2 /* Bottom */;
+        }
+        else if (target.x >= this.map.width - 2) {
+            return 1 /* Right */;
+        }
+        else {
+            return 0 /* Topleft */;
+        }
+    };
+    SimpleSolver.prototype.getTopleftCase = function (target, destination) {
+        if (target.y === destination.y) {
+            return 0 /* Right */;
+        }
+        else {
+            return 1 /* Else */;
+        }
+    };
+    SimpleSolver.prototype.getPointOfTile = function (tile) {
+        if (tile < 0 || tile >= this.map.width * this.map.height) {
+            console.error("- ! Wrong tile number passed to method getPointOfTile(%d)", tile);
+            return;
+        }
+        var i = 1, x = 0, y = 0;
+        while (this.map.map[x][y] !== tile) {
+            i++;
+            x = (i - 1) % this.map.width;
+            y = Math.floor((i - 1) / this.map.width);
+        }
+        return { x: x, y: y };
     };
     /**
      *      <,<,<,<,D,<,<,T,>,>
@@ -196,14 +305,46 @@ var SimpleSolver = (function (_super) {
         // special rule: if point.x == target.x then
         // pointDir will be opposite of targetDir
         // and therefore will be behind.
-        var pointDir = sign(point.x - target.x);
+        var pointDir = sign(target.x - point.x);
         if (pointDir === 0) {
             pointDir = -targetDir;
         }
         return targetDir === pointDir;
     };
     SimpleSolver.prototype.moveToRow = function (target, destination) {
-        return this.map.gap;
+        /**
+         * At this point target is already in the correct column.
+         *
+         * To move the target up to the destination the gap needs to be
+         * above the target.
+         *
+         * 1. The gap is not in the same column and above T.
+         *      > return T.x|G.y, it will move the gap directly above T
+         * 2. the gap is not in the same column and below T.
+         *
+         */
+        if (this.map.gap.x !== target.x) {
+            // situation 1:
+            if (this.isInFrontOf(this.map.gap, target, destination)) {
+                console.log("\t\t\t- Gap not in the same row, and in front of Target");
+                return { x: this.map.gap.x, y: target.y };
+            }
+            else {
+                console.log("\t\t\t- Gap not in the same row, and behind Target");
+                return { x: destination.x, y: this.map.gap.y };
+            }
+        }
+        else {
+            // situation 3:
+            if (this.isInFrontOf(this.map.gap, target, destination)) {
+                console.log("\t\t\t- Gap in the same row, and in front of Target");
+                return target;
+            }
+            else {
+                console.log("\t\t\t- Gap in the same row, and behind Target");
+                return { x: this.map.gap.x, y: this.map.gap.y + 1 };
+            }
+        }
     };
     return SimpleSolver;
 }(Solver));

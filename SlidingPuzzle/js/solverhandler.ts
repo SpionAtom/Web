@@ -52,7 +52,7 @@ class SolverHandler {
     start() {
         if (!this.running) {
             this.running = true;            
-            this.solverTickerRef = setInterval(this.solveTicker, 1000); 
+            this.solverTickerRef = setInterval(this.solveTicker, 10); 
         }
         this.showSolveButton("Stop solving");        
     }
@@ -69,8 +69,7 @@ class SolverHandler {
         document.getElementById('solve').innerHTML = text;
     }
 
-    solveTicker() {
-        console.log("- check if solved");
+    solveTicker() {        
         if (app.map.alreadySolved()) {
             console.log("- solved!");
             app.solverHandler.stop();
