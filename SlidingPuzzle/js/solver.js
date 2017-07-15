@@ -15,7 +15,7 @@ var Solver = (function () {
     Solver.prototype.start = function () {
         if (!this.running) {
             this.running = true;
-            this.solverTickerRef = setInterval(this.solveTicker, 1000);
+            this.solverTickerRef = setInterval(this.solveTicker, 250);
         }
         this.showSolveButton("Stop solving");
     };
