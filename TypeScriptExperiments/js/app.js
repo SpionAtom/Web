@@ -1,7 +1,7 @@
 ///<reference path="pixi.js.d.ts" />
 ///<reference path="./map.ts" />
 ///<reference path="./tile.ts" />
-///<reference path="./timerhandler.ts" />
+///<reference path="./stepsandtimerhandler.ts" />
 var DEBUGMODE = false;
 var App = (function () {
     function App(_pixiApp) {
@@ -13,13 +13,8 @@ var App = (function () {
         this.tiles = [];
         this.map = new Map(this.config.width, this.config.height);
         this.createTiles();
-        this.steps = 0;
-        this.timerHandler = new TimerHandler();
+        this.stepsAndTimerHandler = new StepsAndTimerHandler();
     }
-    App.prototype.setSteps = function (newSteps) {
-        this.steps = newSteps;
-        document.getElementById('steps').innerHTML = String(this.steps);
-    };
     App.prototype.createTiles = function () {
         // remove all tiles            
         this.tileContainer.removeChildren();
@@ -88,9 +83,9 @@ function onTileClick() {
     if (this.tile.x == app.map.empty.x || this.tile.y == app.map.empty.y) {
         logText += ". Moved Tiles";
         app.map.moveTileAt(this.tile.x, this.tile.y);
-        app.setSteps(app.steps + 1);
         app.arrangeTiles();
-        app.timerHandler.start();
+        app.stepsAndTimerHandler.start();
+        app.stepsAndTimerHandler.incrementSteps();
     }
     console.log(logText);
 }
@@ -98,13 +93,11 @@ function scramble() {
     console.log("Scramble");
     app.map.scramble();
     app.arrangeTiles();
-    app.setSteps(0);
-    app.timerHandler.resetTimer();
+    app.stepsAndTimerHandler.reset();
 }
 function resetGame() {
     console.log("Reset game");
     app.map.order();
     app.arrangeTiles();
-    app.setSteps(0);
-    app.timerHandler.resetTimer();
+    app.stepsAndTimerHandler.reset();
 }

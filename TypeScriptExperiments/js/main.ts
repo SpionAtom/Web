@@ -47,7 +47,7 @@
 
 
 
-    var applicationConfig:IapplicationConfig = {
+    var applicationConfig = {
         resolution: {
             width: 320,
             height: 240,

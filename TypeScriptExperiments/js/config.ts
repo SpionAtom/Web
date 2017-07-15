@@ -1,5 +1,5 @@
 
-    interface IapplicationConfig {
+interface IapplicationConfig {
         resolution: {
             width: number,
             height: number,

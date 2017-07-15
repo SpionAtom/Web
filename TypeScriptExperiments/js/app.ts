@@ -1,7 +1,7 @@
 ///<reference path="pixi.js.d.ts" />
 ///<reference path="./map.ts" />
 ///<reference path="./tile.ts" />
-///<reference path="./timerhandler.ts" />
+///<reference path="./stepsandtimerhandler.ts" />
 
 const DEBUGMODE = false;
 
@@ -13,13 +13,7 @@ const DEBUGMODE = false;
         tileContainer:PIXI.Container;
         tiles;
         map;
-        steps:number;
-        timerHandler:TimerHandler;
-
-        setSteps(newSteps:number) {
-            this.steps = newSteps;
-            document.getElementById('steps').innerHTML = String(this.steps);
-        }
+        stepsAndTimerHandler:StepsAndTimerHandler;
 
         constructor(_pixiApp:PIXI.Application) {
             this.config = { x: 0, y: 0, width: 5, height: 5, tileSize: 1};
@@ -30,8 +24,7 @@ const DEBUGMODE = false;
             this.tiles = [];            
             this.map = new Map(this.config.width, this.config.height);
             this.createTiles();            
-            this.steps = 0;
-            this.timerHandler = new TimerHandler();
+            this.stepsAndTimerHandler = new StepsAndTimerHandler();
         }
 
         createTiles(): void {
@@ -102,8 +95,6 @@ const DEBUGMODE = false;
             this.pixiApp.renderer.resize(this.config.width * factor + margin, this.config.height * factor + margin);            
             this.createTiles();
         }
-
-
         
     }
 
@@ -114,9 +105,9 @@ function onTileClick() {
     if (this.tile.x == app.map.empty.x || this.tile.y == app.map.empty.y) {
         logText += ". Moved Tiles";
         app.map.moveTileAt(this.tile.x, this.tile.y);        
-        app.setSteps(app.steps + 1);
-        app.arrangeTiles();
-        app.timerHandler.start();        
+        app.arrangeTiles();        
+        app.stepsAndTimerHandler.start();    
+        app.stepsAndTimerHandler.incrementSteps();    
     }        
     console.log(logText);
 }
@@ -126,8 +117,7 @@ function scramble() {
     console.log("Scramble");
     app.map.scramble();
     app.arrangeTiles();
-    app.setSteps(0);
-    app.timerHandler.resetTimer();
+    app.stepsAndTimerHandler.reset();
 
 }
 
@@ -135,8 +125,7 @@ function resetGame() {
     console.log("Reset game");
     app.map.order();
     app.arrangeTiles();
-    app.setSteps(0);
-    app.timerHandler.resetTimer();
+    app.stepsAndTimerHandler.reset();
 }
 
 
