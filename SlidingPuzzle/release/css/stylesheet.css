@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #333344;
+}
+h1 {
+  font-family: "Helvetica", Times, serif;
+  font-size: 40px;
+  color: white;
+  text-align: center;
+}
+
+#menu {
+  font-family: "Helvetica", Times, serif;
+  font-size: 1em;
+  text-align: center;
+  color: white;
+}
+
+button {
+  height: 3em;
+}
+
+#CanvasBox {
+  text-align: center;  
+}

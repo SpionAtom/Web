@@ -1,0 +1,378 @@
+var Map = (function () {
+    function Map(_width, _height) {
+        this.width = _width;
+        this.height = _height;
+        this.map = [];
+        this.resize(_width, _height);
+    }
+    // Recreate the map array
+    // Then order the map
+    Map.prototype.resize = function (_width, _height) {
+        console.log("- Resize the map array");
+        this.map = [];
+        this.empty = { x: 0, y: 0 };
+        for (var i = 0; i < _width; i++) {
+            this.map[i] = [];
+        }
+        this.order();
+    };
+    // bring the map in order
+    Map.prototype.order = function () {
+        console.log("- Reset the map array");
+        var n = 1;
+        for (var y = 0; y < this.height; y++) {
+            for (var x = 0; x < this.width; x++) {
+                this.map[x][y] = n;
+                n++;
+            }
+        }
+        // also reset the empty tile position
+        this.empty.x = this.width - 1;
+        this.empty.y = this.height - 1;
+        this.map[this.empty.x][this.empty.y] = 0;
+    };
+    Map.prototype.moveTileAt = function (x, y) {
+        //console.log("move tile at: " + x + ", " + y);
+        var s, k;
+        if (this.empty.y == y) {
+            s = sign(x - this.empty.x);
+            k = this.empty.x;
+            while (k != x) {
+                this.map[k][y] = this.map[k + s][y];
+                k += s;
+            }
+            this.empty.x = x;
+        }
+        if (this.empty.x == x) {
+            s = sign(y - this.empty.y);
+            k = this.empty.y;
+            while (k != y) {
+                this.map[x][k] = this.map[x][k + s];
+                k += s;
+            }
+            this.empty.y = y;
+        }
+        this.map[this.empty.x][this.empty.y] = 0;
+    };
+    Map.prototype.scramble = function () {
+        var times = 1000;
+        for (var i = 0; i < times; i++) {
+            var inX = this.empty.x;
+            var inY = this.empty.y;
+            if (Math.floor(Math.random() * 2) == 1) {
+                do {
+                    inX = Math.floor(Math.random() * this.width);
+                } while (inX == this.empty.x);
+            }
+            else {
+                do {
+                    inY = Math.floor(Math.random() * this.height);
+                } while (inY == this.empty.y);
+            }
+            this.moveTileAt(inX, inY);
+        }
+    };
+    return Map;
+}());
+///<reference path="pixi.js.d.ts" />
+var Tile = (function () {
+    function Tile(app, _num) {
+        this.x = 0;
+        this.y = 0;
+        this.finalX = (_num % app.config.width);
+        this.finalY = (Math.floor(_num / app.config.width));
+        this.num = _num;
+        this.sprite = this.createSprite(app, _num);
+    }
+    Tile.prototype.createSprite = function (app, num) {
+        var tileSize = app.config.tileSize;
+        var renderTexture = PIXI.RenderTexture.create(tileSize, tileSize);
+        var graphics = new PIXI.Graphics();
+        var margin = 3;
+        // draw a rounded rectangle
+        //graphics.lineStyle(2, 0xDDDDDD, 1);
+        graphics.beginFill(0x878787);
+        graphics.drawRect(margin, margin, tileSize - 2 * margin, tileSize - 2 * margin);
+        graphics.endFill();
+        var labelStyle = new PIXI.TextStyle({
+            fontFamily: 'Nunito',
+            fontSize: 0.6 * tileSize,
+            //fontStyle: 'italic',
+            fontWeight: 'bold',
+            fill: 'white'
+            //fill: ['#ffffff', '#cccccc'], // gradient
+            //stroke: '#4a1850',
+            //strokeThickness: 5,
+            //dropShadow: true,
+            //dropShadowColor: '#000000',
+            //dropShadowBlur: 4,
+            //dropShadowAngle: Math.PI / 6,
+            //dropShadowDistance: 6,
+            //wordWrap: true,
+            //wordWrapWidth: 440
+        });
+        var label = new PIXI.Text(String(num + 1), labelStyle);
+        label.anchor.set(0.5);
+        label.x = 0.5 * tileSize;
+        label.y = 0.5 * tileSize;
+        graphics.addChild(label);
+        app.pixiApp.renderer.render(graphics, renderTexture);
+        var sprite = PIXI.Sprite.from(renderTexture.baseTexture);
+        sprite.interactive = true;
+        sprite.buttonMode = true;
+        sprite.tile = this;
+        return sprite;
+    };
+    return Tile;
+}());
+var StepsAndTimerHandler = (function () {
+    function StepsAndTimerHandler() {
+        this.seconds = 0;
+        this.steps = 0;
+        this.running = false;
+    }
+    StepsAndTimerHandler.prototype.start = function () {
+        if (!this.running) {
+            this.running = true;
+            this.seconds = 0;
+            this.steps = 0;
+            this.secondsTickerRef = setInterval(this.secondsTicker, 1000);
+        }
+    };
+    StepsAndTimerHandler.prototype.reset = function () {
+        clearInterval(this.secondsTickerRef);
+        this.seconds = 0;
+        this.steps = 0;
+        this.showSeconds();
+        this.running = false;
+        this.showSteps();
+        this.showSeconds();
+    };
+    StepsAndTimerHandler.prototype.secondsTicker = function () {
+        app.stepsAndTimerHandler.seconds++;
+        app.stepsAndTimerHandler.showSeconds();
+    };
+    StepsAndTimerHandler.prototype.incrementSteps = function () {
+        this.steps++;
+        this.showSteps();
+    };
+    StepsAndTimerHandler.prototype.showSeconds = function () {
+        document.getElementById('seconds').innerHTML = String(this.seconds);
+    };
+    StepsAndTimerHandler.prototype.showSteps = function () {
+        document.getElementById('steps').innerHTML = String(this.steps);
+    };
+    return StepsAndTimerHandler;
+}());
+///<reference path="pixi.js.d.ts" />
+///<reference path="./map.ts" />
+///<reference path="./tile.ts" />
+///<reference path="./stepsandtimerhandler.ts" />
+var DEBUGMODE = false;
+var App = (function () {
+    function App(_pixiApp) {
+        this.config = { x: 0, y: 0, width: 5, height: 5, tileSize: 1 };
+        this.pixiApp = _pixiApp;
+        this.currentStage = this.pixiApp.stage;
+        this.tileContainer = new PIXI.Container();
+        this.currentStage.addChild(this.tileContainer);
+        this.tiles = [];
+        this.map = new Map(this.config.width, this.config.height);
+        this.createTiles();
+        this.stepsAndTimerHandler = new StepsAndTimerHandler();
+    }
+    App.prototype.createTiles = function () {
+        // remove all tiles            
+        this.tileContainer.removeChildren();
+        this.tiles = [];
+        this.tileContainer.x = this.config.x;
+        this.tileContainer.y = this.config.y;
+        var i, tileSize = this.config.scale;
+        for (i = 0; i < this.config.width * this.config.height - 1; i++) {
+            this.tiles[i] = new Tile(this, i);
+            this.tiles[i].sprite.on('pointerdown', onTileClick);
+            this.tileContainer.addChild(this.tiles[i].sprite);
+        }
+        this.arrangeTiles();
+    };
+    App.prototype.arrangeTiles = function () {
+        //console.log("- Arranging the tiles");            
+        var out;
+        for (var y = 0; y < this.config.height; y++) {
+            out = "    ";
+            for (var x = 0; x < this.config.width; x++) {
+                var m = this.map.map[x][y];
+                out += m + "(" + x + "|" + y + "),";
+                if (m > 0) {
+                    this.tiles[m - 1].sprite.x = x * this.config.tileSize;
+                    this.tiles[m - 1].sprite.y = y * this.config.tileSize;
+                    this.tiles[m - 1].x = x;
+                    this.tiles[m - 1].y = y;
+                    // special tinting if on final position
+                    if (this.tiles[m - 1].x === this.tiles[m - 1].finalX &&
+                        this.tiles[m - 1].y === this.tiles[m - 1].finalY) {
+                        this.tiles[m - 1].sprite.tint = 0xAAFFAA;
+                    }
+                    else {
+                        this.tiles[m - 1].sprite.tint = 0xFFAAAA;
+                    }
+                }
+            }
+            if (DEBUGMODE) {
+                console.log(out);
+            }
+        }
+    };
+    App.prototype.onWindowResize = function (newWidth, newHeight) {
+        var scale = newWidth / newHeight;
+        var swidth = this.config.width * scale;
+        var sheight = this.config.height * scale;
+        if (sheight > newHeight) {
+            scale = newHeight / this.config.height;
+            swidth = this.config.width * scale;
+            sheight = this.config.height * scale;
+        }
+        var factor = (newWidth / this.config.width < newHeight / this.config.height
+            ? newWidth / this.config.width
+            : newHeight / this.config.height);
+        var margin = 10;
+        this.config.x = 0.5 * margin; //(newWidth - this.config.width * factor) / 2;
+        this.config.y = 0.5 * margin; //(newHeight - this.config.height * factor) / 2;
+        this.config.tileSize = factor;
+        this.pixiApp.renderer.resize(this.config.width * factor + margin, this.config.height * factor + margin);
+        this.createTiles();
+    };
+    return App;
+}());
+function onTileClick() {
+    var logText = "- Clicked on: [" + (this.tile.num + 1) + "]";
+    if (this.tile.x == app.map.empty.x || this.tile.y == app.map.empty.y) {
+        logText += ". Moved Tiles";
+        app.map.moveTileAt(this.tile.x, this.tile.y);
+        app.arrangeTiles();
+        app.stepsAndTimerHandler.start();
+        app.stepsAndTimerHandler.incrementSteps();
+    }
+    console.log(logText);
+}
+function scramble() {
+    console.log("- Scramble");
+    app.map.scramble();
+    app.arrangeTiles();
+    app.stepsAndTimerHandler.reset();
+}
+function resetGame() {
+    console.log("- Reset game");
+    app.map.order();
+    app.arrangeTiles();
+    app.stepsAndTimerHandler.reset();
+}
+var applicationConfig = {
+    resolution: {
+        width: 240,
+        height: 240,
+    },
+    backgroundColor: 0x474758,
+    framesPerSeconds: 60
+};
+function sign(n) {
+    if (n > 0) {
+        return 1;
+    }
+    else if (n === 0) {
+        return 0;
+    }
+    else {
+        return -1;
+    }
+}
+// from: https://davidwalsh.name/javascript-debounce-function
+//
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// N milliseconds. If `immediate` is passed, trigger the function on the
+// leading edge, instead of the trailing.
+function debounce(func, wait, immediate) {
+    var timeout;
+    return function () {
+        var context = this, args = arguments;
+        var later = function () {
+            timeout = null;
+            if (!immediate)
+                func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow)
+            func.apply(context, args);
+    };
+}
+;
+///<reference path="pixi.js.d.ts" />
+///<reference path="webfontloader.d.ts" />
+///<reference path="./globals.ts" />
+///<reference path="./config.ts" />
+///<reference path="./app.ts" />
+var WindowHandler = (function () {
+    function WindowHandler() {
+        this.onResize = debounce(function () {
+            console.log("- window resize");
+            var padding = 32;
+            var canvasRect = windowHandler.canvas.getBoundingClientRect();
+            var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
+            w = Math.max(w, 240);
+            h = Math.max(h, 240);
+            windowHandler.pixiApp.renderer.resize(w, h);
+            app.onWindowResize(w, h);
+        }, 250);
+    }
+    WindowHandler.prototype.init = function () {
+        console.log("Initialisierung...");
+        this.pixiApp = new PIXI.Application(applicationConfig.resolution.width, applicationConfig.resolution.height, { backgroundColor: applicationConfig.backgroundColor });
+        this.canvas = document.getElementById("CanvasBox");
+        this.canvas.appendChild(this.pixiApp.view);
+        app = new App(this.pixiApp);
+        var padding = 32;
+        var canvasRect = this.canvas.getBoundingClientRect();
+        var w = window.innerWidth - padding, h = window.innerHeight - canvasRect.top - padding / 2;
+        this.pixiApp.renderer.resize(w, h);
+        app.onWindowResize(w, h);
+        document.getElementById('scramble').addEventListener('click', scramble);
+        document.getElementById('reset').addEventListener('click', resetGame);
+    };
+    return WindowHandler;
+}());
+var windowHandler = new WindowHandler();
+var app;
+window.addEventListener('resize', windowHandler.onResize);
+// http://www.enea.sk/blog/preloading-web-font-pixi.js.html
+var fontName = 'Nunito';
+window.onload = function () {
+    WebFont.load({
+        // this event is triggered when the fonts have been rendered, see https://github.com/typekit/webfontloader
+        active: function () {
+            // let browser take a breath. Some fonts may require more room for taking deep breath
+            setTimeout(function () {
+                windowHandler.init();
+            }, 500);
+        },
+        // when font is loaded do some magic, so font can be correctly rendered immediately after PIXI is initialized
+        fontloading: doMagic,
+        // multiple fonts can be passed here
+        google: {
+            families: [fontName]
+        }
+    });
+};
+// this one is important
+function doMagic() {
+    // create <p> tag with our font and render some text secretly. We don't need to see it after all...
+    var el = document.createElement('p');
+    el.style.fontFamily = fontName;
+    el.style.fontSize = "0px";
+    el.style.visibility = "hidden";
+    el.innerHTML = '.';
+    document.body.appendChild(el);
+}
+;
