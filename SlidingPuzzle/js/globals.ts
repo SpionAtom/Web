@@ -2,7 +2,10 @@ interface Point {
 	x:number,
 	y:number
 }
-
+function equalPoints(p:Point, q:Point):boolean {
+        return p.x === q.x && p.y === q.y;
+	}
+	
 function sign(n:number):number {
     if (n > 0) {
         return 1;

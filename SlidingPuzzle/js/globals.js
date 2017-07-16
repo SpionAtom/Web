@@ -1,3 +1,6 @@
+function equalPoints(p, q) {
+    return p.x === q.x && p.y === q.y;
+}
 function sign(n) {
     if (n > 0) {
         return 1;

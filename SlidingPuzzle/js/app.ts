@@ -18,7 +18,7 @@ const DEBUGMODE = false;
         solverHandler;
 
         constructor(_pixiApp:PIXI.Application) {
-            this.config = { x: 0, y: 0, width: 7, height: 7, tileSize: 1};
+            this.config = { x: 0, y: 0, width: 5, height: 5, tileSize: 1};
             this.pixiApp = _pixiApp;
             this.currentStage = this.pixiApp.stage;            
             this.tileContainer = new PIXI.Container();            

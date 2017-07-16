@@ -77,9 +77,14 @@ class SolverHandler {
         } else {
             console.log("- step");
             let moveAt:Point = app.solverHandler.solver.step();
-            app.solverHandler.solver.map.moveTileAt(moveAt.x, moveAt.y);
-            app.arrangeTiles();
-            app.stepsAndTimerHandler.incrementSteps();
+            if (equalPoints(moveAt, app.map.gap)) {
+                app.solverHandler.stop();
+            } else {
+                app.solverHandler.solver.map.moveTileAt(moveAt.x, moveAt.y);
+                app.arrangeTiles();
+                app.stepsAndTimerHandler.incrementSteps();
+            }
+
         }
     }
 
