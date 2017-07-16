@@ -110,7 +110,59 @@ class SimpleSolver extends Solver {
     }
 
     doMajorCaseRight(destination):Point {
-        console.log("\t- Major Case: Right")
+        console.log("\t- Major Case: Right");
+
+        /**
+         * s,s,s,s,s
+         * s,s,s,D,E
+         * x,x,x,x,x
+         * x,x,x,x,x
+         * x,x,x,x,x
+         * 
+         * Here we have some solved tiles (s), and some unsolved tiles (x).
+         * D is the destination as in Major Case Topleft, but now there is
+         * a seconds destination called E.
+         * We want to reach the following configuration:
+         * 
+         * s,s,s,s,s
+         * s,s,s,x,D
+         * x,x,x,x,E
+         * x,x,x,x,x
+         * x,x,x,x,x
+         */
+
+        
+        var tile = 1 + destination.x + destination.y * this.map.width;        
+        destination.x++; 
+        var target:Point = this.getPointOfTile(tile);
+        var tile2 = 2 + destination.x + destination.y * this.map.width;
+        var target2:Point = this.getPointOfTile(tile2);
+        var destination2:Point = {x:destination.x, y: destination.y + 1};
+
+        
+        console.log("\t- Target is in: %d,%d", target.x, target.y);
+
+        // first move D-target to D.
+        // There is one special case: T is already there. Then move on to E
+        if (target === destination) {
+
+        }
+        // move the second 
+        else {
+            if (target2 === destination2) {
+                return this.doMajorCaseRightFinal(destination);
+            }
+            // move target2 to destination
+            
+        }
+
+        
+        
+
+        return this.map.gap;
+    }
+
+    doMajorCaseRightFinal(destination:Point):Point {
 
         return this.map.gap;
     }
