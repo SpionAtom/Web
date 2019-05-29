@@ -1,0 +1,13 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #FFCB67;
+}
+h1 {
+	font-family: "Helvetica", Times, serif;
+	font-size: 40px;
+	color: white;
+}
+#mycanvas {
+	background-color: blue;
+}
