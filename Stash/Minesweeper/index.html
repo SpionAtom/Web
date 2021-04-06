@@ -9,8 +9,16 @@
     <title>Minesweeper</title>
 </head>
 <body>
+    <div id='settings'>
+        <label for="width">Breite</label>
+        <input type='range' id='width' name='width' min='5' max='30' value='10' oninput='showNewRange()' onchange='showNewRange()'></input><span id='spanWidth'>10</span><br />
+        <label for="height">Höhe</label>
+        <input type='range' id='height' name='height' min='5' max='50' value='10' oninput='showNewRange()' onchange='showNewRange()'></input><span id='spanHeight'>10</span>
+    </div>
+    <button id='button'>Starto</button>
     <div id='clock'>clocko</div>
     <div id='info'>info</div>
-    <div id='field'>fieldo</div>    
+    <div id='field'>fieldo</div>
+     
 </body>
 </html>
