@@ -2,3 +2,20 @@ body {
     color: white;
     background-color: blue;
 }
+
+table {
+    border: 1px solid white;    
+}
+
+
+
+td {
+    border: 1px solid white;
+    width: 35px;
+    height: 35px;
+}
+
+#cell {
+    width: 30px;
+    height: 30px;
+}

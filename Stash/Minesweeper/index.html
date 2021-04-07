@@ -11,11 +11,14 @@
 <body>
     <div id='settings'>
         <label for="width">Breite</label>
-        <input type='range' id='width' name='width' min='5' max='30' value='10' oninput='showNewRange()' onchange='showNewRange()'></input><span id='spanWidth'>10</span><br />
+        <input type='range' id='width' name='width' min='5' max='30' value='8' oninput='showNewRange()' onchange='showNewRange()'></input><span id='spanWidth'></span><br />
         <label for="height">Höhe</label>
-        <input type='range' id='height' name='height' min='5' max='50' value='10' oninput='showNewRange()' onchange='showNewRange()'></input><span id='spanHeight'>10</span>
+        <input type='range' id='height' name='height' min='5' max='50' value='8' oninput='showNewRange()' onchange='showNewRange()'></input><span id='spanHeight'></span><br />
+        <label for="mines">Minen</label>
+        <input type='range' id='mines' name='mines' min='10' max='100' value='10' oninput='showNewRange()' onchange='showNewRange()'></input><span id='spanMines'></span>
     </div>
-    <button id='button'>Starto</button>
+    <button id='button' onclick='restartGame()'>Starto</button>
+    <button id='pause' onclick='pauseGame()'>Pauso</button>
     <div id='clock'>clocko</div>
     <div id='info'>info</div>
     <div id='field'>fieldo</div>
